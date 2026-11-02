@@ -55,14 +55,20 @@ export function purgeLegacyStorage() {
 purgeLegacyStorage();
 
 /**
- * Normalizes any Supabase connection URL.
- * Automatically strips '/rest/v1', removes trailing slashes, and ensures 'https://'.
+ * Normalizes and rectifies any Supabase connection URL.
+ * Automatically strips '/rest/v1', trailing slashes, quotes,
+ * adds 'https://' if missing, and expands standalone project references.
  */
 export function normalizeSupabaseUrl(rawUrl) {
   if (!rawUrl) return '';
-  let clean = rawUrl.trim();
+  let clean = rawUrl.trim().replace(/^["']|["']$/g, '');
 
-  // If user copied just the host or subdomain
+  // If user pasted just a 20-character project ref like 'wfuhdqldeetizzsvvyyo'
+  if (/^[a-z0-9]{15,30}$/i.test(clean)) {
+    return `https://${clean}.supabase.co`;
+  }
+
+  // If user copied just the host or subdomain (e.g. wfuhdqldeetizzsvvyyo.supabase.co)
   if (!clean.startsWith('http://') && !clean.startsWith('https://')) {
     clean = 'https://' + clean;
   }
@@ -73,6 +79,84 @@ export function normalizeSupabaseUrl(rawUrl) {
   clean = clean.replace(/\/+$/, '');
 
   return clean;
+}
+
+/**
+ * Extracts the project reference ID from a Supabase URL
+ */
+export function extractSupabaseProjectId(url) {
+  if (!url) return null;
+  const clean = normalizeSupabaseUrl(url);
+  const match = clean.match(/https?:\/\/([a-z0-9_-]+)\.supabase\.co/i);
+  return match ? match[1] : null;
+}
+
+/**
+ * Rectifies and analyzes user-entered credentials with live diagnostic feedback.
+ */
+export function rectifySupabaseCredentials(rawUrl, rawKey) {
+  const rectifications = [];
+  let cleanUrl = (rawUrl || '').trim().replace(/^["']|["']$/g, '');
+
+  if (rawUrl && rawUrl !== cleanUrl) {
+    rectifications.push('Trimmed extra whitespace & quotation marks');
+  }
+
+  if (cleanUrl) {
+    if (/^[a-z0-9]{15,30}$/i.test(cleanUrl)) {
+      rectifications.push(`Auto-expanded project ID into https://${cleanUrl}.supabase.co`);
+      cleanUrl = `https://${cleanUrl}.supabase.co`;
+    } else {
+      if (!cleanUrl.startsWith('http://') && !cleanUrl.startsWith('https://')) {
+        rectifications.push('Added missing https:// protocol');
+        cleanUrl = 'https://' + cleanUrl;
+      }
+      if (/\/rest\/v1\/?$/i.test(cleanUrl)) {
+        rectifications.push('Stripped /rest/v1 REST endpoint suffix');
+        cleanUrl = cleanUrl.replace(/\/rest\/v1\/?$/i, '');
+      }
+      cleanUrl = cleanUrl.replace(/\/+$/, '');
+    }
+  }
+
+  const projectId = extractSupabaseProjectId(cleanUrl);
+  const isUrlValid = Boolean(cleanUrl && (cleanUrl.includes('.supabase.co') || cleanUrl.startsWith('http')));
+
+  // Analyze Key
+  const cleanKey = (rawKey || '').trim().replace(/^["']|["']$/g, '');
+  const keyWarnings = [];
+  let isKeyJwt = false;
+  let isServiceRole = false;
+
+  if (cleanKey) {
+    const parts = cleanKey.split('.');
+    if (parts.length === 3) {
+      isKeyJwt = true;
+      try {
+        const payloadJson = atob(parts[1].replace(/-/g, '+').replace(/_/g, '/'));
+        const payload = JSON.parse(payloadJson);
+        if (payload.role === 'service_role') {
+          isServiceRole = true;
+          keyWarnings.push('Security Warning: This is a secret service_role key! Never expose it in the frontend. Please use your public anon key.');
+        }
+      } catch {
+        // Safe fallback
+      }
+    } else {
+      keyWarnings.push('Key should be a valid 3-part JWT token (starts with eyJ...). Ensure you copied the public anon key.');
+    }
+  }
+
+  return {
+    url: cleanUrl,
+    key: cleanKey,
+    projectId,
+    isUrlValid,
+    isKeyValid: Boolean(cleanKey && isKeyJwt && !isServiceRole),
+    isServiceRole,
+    rectifications,
+    keyWarnings
+  };
 }
 
 /**
@@ -181,6 +265,7 @@ export async function testSupabaseConnection(rawUrl, rawKey) {
   if (!url) throw new Error('Supabase URL cannot be empty.');
   if (!key) throw new Error('Supabase Anon Key cannot be empty.');
 
+  const startTime = Date.now();
   try {
     const testClient = createClient(url, key, {
       auth: {
@@ -190,10 +275,13 @@ export async function testSupabaseConnection(rawUrl, rawKey) {
     });
 
     const { error } = await testClient.auth.getSession();
+    const latency = Date.now() - startTime;
+    const projectId = extractSupabaseProjectId(url);
+
     if (error && !error.message.includes('fetch')) {
-      return { success: true, url };
+      return { success: true, url, projectId, latency };
     }
-    return { success: true, url };
+    return { success: true, url, projectId, latency };
   } catch (err) {
     throw new Error(`Unable to connect to ${url}: ${err.message}`);
   }
