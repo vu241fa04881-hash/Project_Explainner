@@ -1,9 +1,12 @@
 import os
 from typing import Dict, Any, Optional
 from google import genai
-from dotenv import load_dotenv
 
-load_dotenv()
+try:
+    from dotenv import load_dotenv
+    load_dotenv()
+except ImportError:
+    pass
 
 PREFERRED_MODELS = [
     "gemini-3.5-flash-lite",

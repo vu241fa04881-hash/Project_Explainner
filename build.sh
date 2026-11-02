@@ -8,7 +8,7 @@ echo "=========================================="
 
 echo "1. Installing Python Backend Dependencies..."
 pip install --upgrade pip
-pip install -r backend/requirements.txt
+pip install -r requirements.txt
 
 echo "2. Building React Frontend..."
 cd frontend
