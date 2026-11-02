@@ -17,3 +17,4 @@ npm run build
 cd ..
 
 echo "Build completed successfully!"
+

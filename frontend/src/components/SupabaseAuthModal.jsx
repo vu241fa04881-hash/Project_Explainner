@@ -349,7 +349,7 @@ CREATE POLICY "Users own files" ON public.project_files FOR ALL TO authenticated
         )}
 
         <div className="modal-body" style={{ padding: '1.25rem' }}>
-          {/* Privacy Guarantee Banner */}
+          {/* Privacy & Zero-Storage Guarantee Banner */}
           <div style={{
             backgroundColor: 'rgba(16, 185, 129, 0.08)',
             border: '1px solid rgba(16, 185, 129, 0.25)',
@@ -362,8 +362,8 @@ CREATE POLICY "Users own files" ON public.project_files FOR ALL TO authenticated
           }}>
             <Lock size={16} color="#34d399" style={{ marginTop: '2px', flexShrink: 0 }} />
             <div style={{ fontSize: '0.78rem', color: '#cbd5e1', lineHeight: '1.45' }}>
-              <strong style={{ color: '#34d399' }}>100% Private &amp; Isolated: </strong>
-              By connecting your own Supabase project URL, your uploaded repository files, data files, and diagrams are stored directly in your own PostgreSQL database. No outside server can view or access your data.
+              <strong style={{ color: '#34d399' }}>Zero-Storage Ephemeral Policy: </strong>
+              Your Supabase Project URL and Anon Key are kept <strong>strictly in volatile browser RAM</strong>. They are <strong>never written to localStorage, cookies, or any server disk</strong>. All your codebase files and data are sent directly from your browser to your private database and are immediately cleared from memory when you close or reload this page.
             </div>
           </div>
 
@@ -379,9 +379,9 @@ CREATE POLICY "Users own files" ON public.project_files FOR ALL TO authenticated
                     type="button"
                     onClick={handleResetDefault}
                     style={{ background: 'none', border: 'none', color: '#94a3b8', fontSize: '0.72rem', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '3px' }}
-                    title="Reset to default URL"
+                    title="Clear in-memory credentials"
                   >
-                    <RotateCcw size={11} /> Reset to Default
+                    <RotateCcw size={11} /> Clear Credentials
                   </button>
                 )}
               </div>
@@ -432,7 +432,7 @@ CREATE POLICY "Users own files" ON public.project_files FOR ALL TO authenticated
                 ) : (
                   <>
                     <Database size={14} />
-                    <span>Save &amp; Connect to My Supabase</span>
+                    <span>Apply &amp; Connect (In-Memory)</span>
                   </>
                 )}
               </button>

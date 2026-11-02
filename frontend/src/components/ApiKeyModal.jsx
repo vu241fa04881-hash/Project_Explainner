@@ -78,9 +78,9 @@ export default function ApiKeyModal({ isOpen, onClose, apiKey, onSaveKey }) {
               style={{ width: '100%', fontFamily: 'monospace' }}
             />
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.4rem', marginTop: '0.6rem', fontSize: '0.75rem' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: '#64748b' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: '#10b981' }}>
                 <ShieldCheck size={14} color="#10b981" />
-                <span>Saved only in your browser's local storage.</span>
+                <span>In-memory only: Never saved to disk or localStorage.</span>
               </div>
               <a
                 href="https://aistudio.google.com/app/apikey"
@@ -95,15 +95,15 @@ export default function ApiKeyModal({ isOpen, onClose, apiKey, onSaveKey }) {
 
           <div style={{ background: 'rgba(255, 255, 255, 0.03)', padding: '0.85rem', borderRadius: '8px', marginBottom: '1.5rem', fontSize: '0.8rem', color: '#94a3b8', lineHeight: 1.5 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: '#38bdf8', fontWeight: 600, marginBottom: '0.3rem' }}>
-              <Sparkles size={14} /> Heuristic Mode vs Gemini Mode
+              <Sparkles size={14} /> Zero-Storage Ephemeral Policy
             </div>
-            Without an API key, Project Explainer runs 100% offline using AST parsing & graph metrics. When you supply your own Gemini API Key, you unlock AI-powered architecture explanations, conversational code queries, and logic deep dives.
+            Your Gemini API Key is held strictly in volatile RAM memory for this tab session. It is never logged, never stored on disk, and is instantly cleared as soon as you close or reload this page.
           </div>
 
           <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.75rem' }}>
             {apiKey && (
               <button type="button" onClick={handleClear} className="btn-secondary" style={{ color: '#f43f5e' }}>
-                Remove Key
+                Clear Key
               </button>
             )}
             <button type="button" onClick={onClose} className="btn-secondary">
@@ -112,10 +112,10 @@ export default function ApiKeyModal({ isOpen, onClose, apiKey, onSaveKey }) {
             <button type="submit" className="btn-primary">
               {savedSuccess ? (
                 <>
-                  <CheckCircle size={16} /> Saved!
+                  <CheckCircle size={16} /> Applied!
                 </>
               ) : (
-                'Save Key'
+                'Apply Key (In-Memory)'
               )}
             </button>
           </div>

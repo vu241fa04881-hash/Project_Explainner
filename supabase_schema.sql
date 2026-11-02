@@ -119,7 +119,7 @@ CREATE POLICY "Users can read own profile"
     ON public.profiles FOR SELECT
     TO authenticated
     USING (auth.uid() = id);
-
+ 
 DROP POLICY IF EXISTS "Users can update own profile" ON public.profiles;
 CREATE POLICY "Users can update own profile"
     ON public.profiles FOR UPDATE

@@ -35,7 +35,8 @@ export default function App() {
   const [loading, setLoading] = useState(false);
   const [loadingStatus, setLoadingStatus] = useState('');
   const [error, setError] = useState(null);
-  const [apiKey, setApiKey] = useState(() => localStorage.getItem('GEMINI_API_KEY') || '');
+  // Ephemeral In-Memory Only state (NEVER written to disk or localStorage)
+  const [apiKey, setApiKey] = useState('');
   const [isApiKeyModalOpen, setIsApiKeyModalOpen] = useState(false);
   const [isSupabaseModalOpen, setIsSupabaseModalOpen] = useState(false);
   const [supabaseUser, setSupabaseUser] = useState(null);
@@ -45,6 +46,13 @@ export default function App() {
   const [activeExplainerFile, setActiveExplainerFile] = useState(null);
 
   React.useEffect(() => {
+    // Purge any stored keys from localStorage
+    try {
+      localStorage.removeItem('GEMINI_API_KEY');
+      localStorage.removeItem('SUPABASE_URL');
+      localStorage.removeItem('SUPABASE_ANON_KEY');
+    } catch {}
+
     getCurrentUser().then((user) => setSupabaseUser(user)).catch(() => {});
     const sub = onAuthStateChange((_event, session) => {
       setSupabaseUser(session?.user || null);
@@ -52,14 +60,9 @@ export default function App() {
     return () => sub?.unsubscribe?.();
   }, []);
 
-
   const handleSaveApiKey = (key) => {
-    setApiKey(key);
-    if (key) {
-      localStorage.setItem('GEMINI_API_KEY', key);
-    } else {
-      localStorage.removeItem('GEMINI_API_KEY');
-    }
+    // Kept strictly in active RAM memory for the current session
+    setApiKey((key || '').trim());
   };
 
   const handleOpenSourceModal = (tab = 'folder') => {
