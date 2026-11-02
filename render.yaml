@@ -1,0 +1,28 @@
+# ==============================================================================
+# Render.com Blueprint Specification for Project Explainer
+# Repository: https://github.com/vu241fa04881-hash/Project_Explainner.git
+# Docs: https://render.com/docs/blueprint-spec
+# ==============================================================================
+
+services:
+  # Unified Web Service (FastAPI serves both the API & the React SPA Frontend)
+  - type: web
+    name: project-explainer
+    runtime: python
+    plan: free
+    region: oregon
+    buildCommand: "pip install -r backend/requirements.txt && cd frontend && npm install && npm run build && cd .."
+    startCommand: "python -m uvicorn backend.app.main:app --host 0.0.0.0 --port $PORT"
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.0
+      - key: NODE_VERSION
+        value: 20.12.0
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_ANON_KEY
+        sync: false
+      - key: SUPABASE_SERVICE_ROLE_KEY
+        sync: false
