@@ -10,7 +10,8 @@ import {
   AlertCircle,
   Loader2,
   CheckCircle2,
-  ExternalLink
+  ExternalLink,
+  BookOpen
 } from 'lucide-react';
 
 const SAMPLE_REPOS = [
@@ -27,6 +28,7 @@ export default function ProjectSourceModal({
   onCloneGit,
   onUploadFolder,
   onUploadZip,
+  onOpenSavedProjects,
   loading,
   loadingStatus,
   initialTab = 'folder'
@@ -246,6 +248,22 @@ export default function ProjectSourceModal({
             <FolderSearch size={16} />
             <span>Local Path</span>
           </button>
+
+          {onOpenSavedProjects && (
+            <button
+              type="button"
+              className="source-tab-btn"
+              style={{ color: '#34d399', marginLeft: 'auto' }}
+              onClick={() => {
+                onClose();
+                onOpenSavedProjects();
+              }}
+              title="Study previously saved uploads from Supabase"
+            >
+              <BookOpen size={16} color="#34d399" />
+              <span>Saved in Database</span>
+            </button>
+          )}
         </div>
 
         {/* Error Notice */}

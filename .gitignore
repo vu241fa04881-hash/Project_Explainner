@@ -57,3 +57,7 @@ Thumbs.db
 *.swp
 *.log
 
+# Agent & Skills Lock
+.agents/
+skills-lock.json
+

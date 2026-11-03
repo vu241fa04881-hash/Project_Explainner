@@ -19,13 +19,14 @@ import Header from './components/Header';
 import ApiKeyModal from './components/ApiKeyModal';
 import SupabaseAuthModal from './components/SupabaseAuthModal';
 import ProjectSourceModal from './components/ProjectSourceModal';
+import SavedProjectsModal from './components/SavedProjectsModal';
 import ChatbotWidget from './components/ChatbotWidget';
 import ArchitectureTab from './components/ArchitectureTab';
 import VisualizerTab from './components/VisualizerTab';
 import InspectorTab from './components/InspectorTab';
 import AssistantTab from './components/AssistantTab';
 import CodeExplainerTab from './components/CodeExplainerTab';
-import { getCurrentUser, onAuthStateChange } from './lib/supabaseClient';
+import { getCurrentUser, onAuthStateChange, saveProjectScan, isSupabaseConfigured } from './lib/supabaseClient';
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || (import.meta.env.DEV ? 'http://127.0.0.1:8000' : '');
 
@@ -44,6 +45,8 @@ export default function App() {
   const [sourceModalInitialTab, setSourceModalInitialTab] = useState('folder');
   const [activeInspectorFile, setActiveInspectorFile] = useState(null);
   const [activeExplainerFile, setActiveExplainerFile] = useState(null);
+  const [isSavedProjectsModalOpen, setIsSavedProjectsModalOpen] = useState(false);
+  const [saveStatus, setSaveStatus] = useState('');
 
   React.useEffect(() => {
     // Purge any stored keys from localStorage
@@ -63,6 +66,42 @@ export default function App() {
   const handleSaveApiKey = (key) => {
     // Kept strictly in active RAM memory for the current session
     setApiKey((key || '').trim());
+  };
+
+  // Automatically save analyzed project and files to user's private Supabase if authenticated
+  const autoSaveToDatabase = React.useCallback(async (data) => {
+    if (!supabaseUser || !isSupabaseConfigured() || !data) return;
+    try {
+      setSaveStatus('Saving uploaded project & documents to your Supabase database...');
+      const res = await saveProjectScan({
+        projectName: data.repo_name || data.summary?.repo_name || 'Project Scan',
+        sourceType: data.source_type || 'folder',
+        sourceUrl: data.repo_path || '',
+        scanData: data,
+        syncFiles: true
+      });
+      setSaveStatus(`✓ Saved "${res.project.name}" & ${res.syncedFilesCount} files to your Supabase database!`);
+      setTimeout(() => setSaveStatus(''), 5000);
+    } catch (err) {
+      console.warn('Auto-save note:', err.message);
+      setSaveStatus(`Database sync note: ${err.message}`);
+      setTimeout(() => setSaveStatus(''), 5000);
+    }
+  }, [supabaseUser]);
+
+  const handleScanSuccess = React.useCallback((data) => {
+    setScanData(data);
+    setActiveInspectorFile(null);
+    autoSaveToDatabase(data);
+  }, [autoSaveToDatabase]);
+
+  const handleLoadSavedProject = (loadedScanData) => {
+    setScanData(loadedScanData);
+    setActiveTab('architecture');
+    setActiveInspectorFile(null);
+    setActiveExplainerFile(null);
+    setSaveStatus(`✓ Loaded "${loadedScanData.repo_name}" from your database for study.`);
+    setTimeout(() => setSaveStatus(''), 4500);
   };
 
   const handleOpenSourceModal = (tab = 'folder') => {
@@ -86,8 +125,7 @@ export default function App() {
         throw new Error(errData.detail || `Scan failed with status ${res.status}`);
       }
       const data = await res.json();
-      setScanData(data);
-      setActiveInspectorFile(null);
+      handleScanSuccess(data);
     } catch (err) {
       console.error(err);
       setError(err.message);
@@ -118,8 +156,7 @@ export default function App() {
         throw new Error(errData.detail || `Clone failed with status ${res.status}`);
       }
       const data = await res.json();
-      setScanData(data);
-      setActiveInspectorFile(null);
+      handleScanSuccess(data);
     } catch (err) {
       console.error(err);
       setError(err.message);
@@ -220,8 +257,7 @@ export default function App() {
       }
 
       if (finalScanData) {
-        setScanData(finalScanData);
-        setActiveInspectorFile(null);
+        handleScanSuccess(finalScanData);
       }
     } catch (err) {
       console.error(err);
@@ -255,8 +291,7 @@ export default function App() {
         throw new Error(errData.detail || `ZIP upload failed with status ${res.status}`);
       }
       const data = await res.json();
-      setScanData(data);
-      setActiveInspectorFile(null);
+      handleScanSuccess(data);
     } catch (err) {
       console.error(err);
       setError(err.message);
@@ -303,6 +338,7 @@ export default function App() {
         onScan={handleScan}
         onCloneGit={handleCloneGit}
         onOpenSourceModal={() => handleOpenSourceModal('folder')}
+        onOpenSavedProjectsModal={() => setIsSavedProjectsModalOpen(true)}
         onCloseWorkspace={handleCloseWorkspace}
         loading={loading}
         apiKey={apiKey}
@@ -319,6 +355,12 @@ export default function App() {
               <span className="stat-label">Project:</span>
               <span className="stat-value" style={{ color: '#38bdf8' }}>{scanData.repo_name}</span>
             </div>
+            {scanData.isFromSupabase && (
+              <div className="stat-pill" style={{ borderColor: 'rgba(52, 211, 153, 0.4)', backgroundColor: 'rgba(52, 211, 153, 0.08)' }}>
+                <span className="stat-label" style={{ color: '#34d399' }}>Source:</span>
+                <span className="stat-value" style={{ color: '#34d399' }}>Saved in Supabase</span>
+              </div>
+            )}
             <div className="stat-pill">
               <span className="stat-label">Files:</span>
               <span className="stat-value">{scanData.total_files}</span>
@@ -605,6 +647,7 @@ export default function App() {
         onCloneGit={handleCloneGit}
         onUploadFolder={handleUploadFolder}
         onUploadZip={handleUploadZip}
+        onOpenSavedProjects={() => setIsSavedProjectsModalOpen(true)}
         loading={loading}
         loadingStatus={loadingStatus}
         initialTab={sourceModalInitialTab}
@@ -627,6 +670,40 @@ export default function App() {
           console.log('Project synchronized to Supabase Cloud:', res);
         }}
       />
+
+      {/* Study Saved Projects Modal */}
+      <SavedProjectsModal
+        isOpen={isSavedProjectsModalOpen}
+        onClose={() => setIsSavedProjectsModalOpen(false)}
+        onOpenSupabaseConnect={() => setIsSupabaseModalOpen(true)}
+        onLoadProject={handleLoadSavedProject}
+        apiBaseUrl={API_BASE}
+      />
+
+      {/* Live Save / Load Status Notification Toast */}
+      {saveStatus && (
+        <div style={{
+          position: 'fixed',
+          bottom: '24px',
+          right: '24px',
+          backgroundColor: '#0f172a',
+          border: '1px solid rgba(52, 211, 153, 0.45)',
+          color: '#f8fafc',
+          padding: '0.75rem 1.15rem',
+          borderRadius: '8px',
+          fontSize: '0.84rem',
+          boxShadow: '0 10px 25px rgba(0, 0, 0, 0.5), 0 0 15px rgba(52, 211, 153, 0.2)',
+          zIndex: 9999,
+          display: 'flex',
+          alignItems: 'center',
+          gap: '0.6rem',
+          animation: 'fadeIn 0.2s ease',
+          maxWidth: '480px'
+        }}>
+          <Database size={16} color="#34d399" style={{ flexShrink: 0 }} />
+          <span style={{ lineHeight: 1.4 }}>{saveStatus}</span>
+        </div>
+      )}
     </div>
   );
 }

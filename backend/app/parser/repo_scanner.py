@@ -197,6 +197,7 @@ def scan_repository(repo_path: str, max_files: Optional[int] = None, max_file_si
                         "size_kb": round(file_size_kb, 2),
                         "size_bytes": file_size_bytes,
                         "loc": loc,
+                        "content": code_for_analysis if file_size_kb <= 256 else code_for_analysis[:65536],
                         "analysis": analysis
                     }
 

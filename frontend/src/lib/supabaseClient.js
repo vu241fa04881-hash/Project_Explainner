@@ -476,6 +476,7 @@ export async function syncProjectFilesToSupabase({
       language: fileObj.language || (isData ? 'data' : 'code'),
       size_bytes: fileObj.size_bytes || Math.round((fileObj.size_kb || 0) * 1024),
       loc: fileObj.loc || 0,
+      content: fileObj.content || null,
       metadata: fileObj.analysis?.metadata || {},
     };
   });
@@ -544,4 +545,192 @@ export async function deleteProject(projectId) {
 
   if (error) throw error;
   return true;
+}
+
+/**
+ * Reconstructs a nested file tree from flat files dictionary
+ */
+export function buildTreeFromFilesMap(filesMap, rootName = 'root') {
+  const root = {
+    name: rootName,
+    type: 'directory',
+    path: '',
+    children: []
+  };
+
+  Object.keys(filesMap || {}).forEach((filePath) => {
+    const parts = filePath.split('/');
+    let current = root;
+    let currentPath = '';
+
+    for (let i = 0; i < parts.length; i++) {
+      const part = parts[i];
+      currentPath = currentPath ? `${currentPath}/${part}` : part;
+      const isFile = i === parts.length - 1;
+
+      let existing = current.children.find((child) => child.name === part);
+      if (!existing) {
+        existing = {
+          name: part,
+          type: isFile ? 'file' : 'directory',
+          path: currentPath,
+          children: isFile ? undefined : []
+        };
+        current.children.push(existing);
+      }
+      if (!isFile) {
+        current = existing;
+      }
+    }
+  });
+
+  function sortChildren(node) {
+    if (node.children) {
+      node.children.sort((a, b) => {
+        if (a.type !== b.type) {
+          return a.type === 'directory' ? -1 : 1;
+        }
+        return a.name.localeCompare(b.name);
+      });
+      node.children.forEach(sortChildren);
+    }
+  }
+
+  sortChildren(root);
+  return root;
+}
+
+/**
+ * Loads a complete project record, scan, architecture diagrams, and files from Supabase
+ * to study past uploaded documents directly in the workspace.
+ */
+export async function loadProjectFullData(projectId) {
+  const client = getSupabaseClient();
+  if (!client) throw new Error('Supabase is not configured.');
+
+  // 1. Fetch project metadata
+  const { data: project, error: projError } = await client
+    .from('projects')
+    .select('*')
+    .eq('id', projectId)
+    .single();
+
+  if (projError || !project) {
+    throw new Error(`Project not found: ${projError?.message || ''}`);
+  }
+
+  // 2. Fetch latest project scan
+  const { data: scans, error: scanError } = await client
+    .from('project_scans')
+    .select('*')
+    .eq('project_id', projectId)
+    .order('created_at', { ascending: false })
+    .limit(1);
+
+  const scan = scans?.[0] || {};
+
+  // 3. Fetch all project files (in chunks of 1000 records)
+  let allFiles = [];
+  let from = 0;
+  const pageSize = 1000;
+  let hasMore = true;
+
+  while (hasMore) {
+    const { data: filesChunk, error: filesError } = await client
+      .from('project_files')
+      .select('file_path, file_name, extension, file_category, language, size_bytes, loc, content, metadata')
+      .eq('project_id', projectId)
+      .range(from, from + pageSize - 1);
+
+    if (filesError) {
+      console.warn('Error fetching project files:', filesError.message);
+      break;
+    }
+
+    if (filesChunk && filesChunk.length > 0) {
+      allFiles = allFiles.concat(filesChunk);
+      from += filesChunk.length;
+      if (filesChunk.length < pageSize) {
+        hasMore = false;
+      }
+    } else {
+      hasMore = false;
+    }
+  }
+
+  // 4. Reconstruct files map dictionary
+  const filesMap = {};
+  allFiles.forEach((file) => {
+    filesMap[file.file_path] = {
+      path: file.file_path,
+      name: file.file_name,
+      extension: file.extension,
+      category: file.file_category,
+      language: file.language,
+      size_bytes: file.size_bytes,
+      size_kb: Number((file.size_bytes / 1024).toFixed(2)),
+      loc: file.loc,
+      content: file.content || '',
+      analysis: {
+        metadata: file.metadata || {}
+      }
+    };
+  });
+
+  const totalFiles = project.files_count || allFiles.length;
+  const dataFilesCount = project.data_files_count || allFiles.filter((f) => f.file_category === 'data').length;
+  const codeFilesCount = Math.max(0, totalFiles - dataFilesCount);
+
+  // 5. Build visualizer graph nodes and tree
+  const nodes = Object.entries(filesMap).map(([path, f]) => ({
+    id: path,
+    label: f.name,
+    category: f.category,
+    size: f.size_bytes,
+    loc: f.loc,
+  }));
+
+  const tree = buildTreeFromFilesMap(filesMap, project.name);
+
+  // 6. Return reconstructed scanData
+  return {
+    repo_name: project.name,
+    repo_path: project.source_url || `supabase://${project.name}`,
+    source_type: project.source_type || 'folder',
+    total_files: totalFiles,
+    code_files_count: codeFilesCount,
+    data_files_count: dataFilesCount,
+    total_loc: project.loc || 0,
+    languages: project.languages || {},
+    summary: {
+      repo_name: project.name,
+      total_files: totalFiles,
+      total_loc: project.loc || 0,
+      languages: project.languages || {},
+      overview: scan.summary || '',
+    },
+    architecture_layers: scan.architecture_layers || {},
+    diagrams: {
+      architecture_layers: scan.diagrams?.architecture || '',
+      dependencies: scan.diagrams?.dependency || '',
+      classes: scan.diagrams?.class_hierarchy || '',
+    },
+    high_coupling_modules: scan.high_coupling_modules || [],
+    circular_dependencies: scan.circular_dependencies || [],
+    files: filesMap,
+    tree,
+    graph: {
+      nodes,
+      edges: [],
+      stats: {
+        total_nodes: nodes.length,
+        total_edges: 0,
+        density: 0,
+      }
+    },
+    explanation: scan.summary ? { overview: scan.summary } : null,
+    isFromSupabase: true,
+    supabaseProjectId: project.id,
+    savedAt: project.created_at
+  };
 }

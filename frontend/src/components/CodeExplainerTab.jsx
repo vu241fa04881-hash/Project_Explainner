@@ -148,8 +148,23 @@ export default function CodeExplainerTab({
   const [viewTab, setViewTab] = useState('explanation'); // 'explanation' | 'flowchart'
   const [followUpQuestion, setFollowUpQuestion] = useState('');
 
-  // Fetch file content from backend
+  // Fetch file content from in-memory scanData or backend
   const loadFileContent = useCallback(async (filePath) => {
+    // If file content is already present in scanData (e.g. loaded from Supabase)
+    if (scanData?.files?.[filePath]?.content) {
+      const cached = {
+        path: filePath,
+        name: scanData.files[filePath].name || filePath.split('/').pop(),
+        content: scanData.files[filePath].content,
+        language: scanData.files[filePath].language || 'text',
+        size_bytes: scanData.files[filePath].size_bytes || 0,
+        loc: scanData.files[filePath].loc || 0,
+        analysis: scanData.files[filePath].analysis || {}
+      };
+      setFileDetails(cached);
+      return cached;
+    }
+
     try {
       const res = await fetch(`${apiBaseUrl}/api/file?path=${encodeURIComponent(filePath)}`);
       if (res.ok) {
@@ -161,7 +176,7 @@ export default function CodeExplainerTab({
       console.error('Error fetching file content:', e);
     }
     return null;
-  }, [apiBaseUrl]);
+  }, [apiBaseUrl, scanData]);
 
   // Request explanation from backend
   const explainCode = useCallback(async ({

@@ -75,6 +75,18 @@ class CodeExplainRequest(BaseModel):
     api_key: Optional[str] = None
     symbol_name: Optional[str] = None
 
+class RestoreSessionRequest(BaseModel):
+    repo_name: str
+    repo_path: Optional[str] = "supabase://stored_project"
+    total_files: int = 0
+    total_loc: int = 0
+    languages: Optional[Dict[str, Any]] = None
+    files: Optional[Dict[str, Any]] = None
+    tree: Optional[Dict[str, Any]] = None
+    diagrams: Optional[Dict[str, Any]] = None
+    explanation: Optional[Dict[str, Any]] = None
+    symbol_name: Optional[str] = None
+
 
 def _process_scanned_repo(repo_path: str, display_name: Optional[str] = None, api_key: Optional[str] = None) -> Dict[str, Any]:
     p = Path(repo_path).resolve()
@@ -373,6 +385,35 @@ async def upload_zip_project(
     return _process_scanned_repo(str(scan_dir), display_name=zip_display_name, api_key=api_key)
 
 
+@app.post("/api/restore-session")
+def restore_session(req: RestoreSessionRequest):
+    """
+    Restores an active exploration session from previously saved Supabase documents,
+    enabling full AI code Q&A, diagram viewing, and code explanation without re-uploading.
+    """
+    repo_data = {
+        "repo_name": req.repo_name,
+        "repo_path": req.repo_path or f"supabase://{req.repo_name}",
+        "total_files": req.total_files,
+        "total_loc": req.total_loc,
+        "languages": req.languages or {},
+        "files": req.files or {},
+        "tree": req.tree,
+        "readme": None,
+    }
+    CURRENT_SESSION["repo_data"] = repo_data
+    if req.diagrams:
+        CURRENT_SESSION["diagrams"] = req.diagrams
+    if req.explanation:
+        CURRENT_SESSION["explanation"] = req.explanation
+
+    return {
+        "status": "success",
+        "message": f"Session restored successfully for {req.repo_name}",
+        "files_count": len(req.files or {})
+    }
+
+
 @app.get("/api/file")
 def get_file_content(path: str = Query(..., description="Relative file path")):
     repo_data = CURRENT_SESSION.get("repo_data")
@@ -384,8 +425,19 @@ def get_file_content(path: str = Query(..., description="Relative file path")):
     if not file_info:
         raise HTTPException(status_code=404, detail=f"File not found in scanned data: {path}")
 
-    # Read actual file content
-    full_path = Path(repo_data["repo_path"]) / clean_path
+    # 1. Return in-memory content if already loaded (e.g. from Supabase or previous scan)
+    if file_info.get("content") is not None and file_info.get("content") != "":
+        return {
+            "path": clean_path,
+            "name": file_info.get("name"),
+            "language": file_info.get("language"),
+            "loc": file_info.get("loc"),
+            "analysis": file_info.get("analysis"),
+            "content": file_info.get("content")
+        }
+
+    # 2. Otherwise read actual file content from disk
+    full_path = Path(repo_data.get("repo_path", "")) / clean_path
     content = ""
     if full_path.exists() and full_path.is_file():
         try:

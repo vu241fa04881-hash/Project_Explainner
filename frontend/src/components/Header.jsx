@@ -12,7 +12,8 @@ import {
   X,
   Database,
   Shield,
-  Lock
+  Lock,
+  BookOpen
 } from 'lucide-react';
 
 export default function Header({
@@ -21,6 +22,7 @@ export default function Header({
   onScan,
   onCloneGit,
   onOpenSourceModal,
+  onOpenSavedProjectsModal,
   onCloseWorkspace,
   loading,
   apiKey,
@@ -73,9 +75,25 @@ export default function Header({
             title="Upload folder, clone Git repo, or unpack ZIP"
           >
             <FolderUp size={16} color="#38bdf8" />
-            <span className="open-project-btn-label">Open / Ingest Project</span>
+            <span className="open-project-btn-label">Open / Ingest</span>
             {repoName && <span className="active-repo-badge">{repoName}</span>}
           </button>
+
+          <button
+            type="button"
+            onClick={onOpenSavedProjectsModal}
+            className="btn-open-project"
+            style={{
+              background: 'rgba(52, 211, 153, 0.09)',
+              borderColor: 'rgba(52, 211, 153, 0.35)',
+              color: '#34d399'
+            }}
+            title="Access and study previously uploaded documents and projects from your Supabase database"
+          >
+            <BookOpen size={16} color="#34d399" />
+            <span className="open-project-btn-label">Study Saved</span>
+          </button>
+
           {repoName && onCloseWorkspace && (
             <button
               type="button"
