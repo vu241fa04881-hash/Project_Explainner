@@ -346,7 +346,7 @@ export default function CodeExplainerTab({
         <div className="explainer-header-top">
           <div className="explainer-title-group">
             <div className="explainer-badge-icon">
-              <Sparkles size={20} color="#38bdf8" />
+              <Sparkles size={20} color="#4f46e5" />
             </div>
             <div>
               <h2 className="explainer-main-title">Code & Logic Explainer</h2>
@@ -361,9 +361,9 @@ export default function CodeExplainerTab({
               <div
                 className="ai-source-badge"
                 style={{
-                  background: explanation.is_ai_generated ? 'rgba(56, 189, 248, 0.12)' : 'rgba(245, 158, 11, 0.12)',
-                  borderColor: explanation.is_ai_generated ? 'rgba(56, 189, 248, 0.3)' : 'rgba(245, 158, 11, 0.3)',
-                  color: explanation.is_ai_generated ? '#38bdf8' : '#fbbf24'
+                  background: explanation.is_ai_generated ? '#eef2ff' : '#fffbeb',
+                  borderColor: explanation.is_ai_generated ? '#c7d2fe' : '#fde68a',
+                  color: explanation.is_ai_generated ? '#4f46e5' : '#d97706'
                 }}
               >
                 {explanation.is_ai_generated ? <Sparkles size={13} /> : <AlertCircle size={13} />}
@@ -665,11 +665,11 @@ export default function CodeExplainerTab({
           {/* Loading Overlay */}
           {loading && (
             <div className="explainer-loading-state">
-              <Loader2 size={32} color="#38bdf8" className="spin-animation" />
-              <div style={{ fontWeight: 600, fontSize: '0.95rem', color: '#f1f5f9' }}>
+              <Loader2 size={32} color="#4f46e5" className="spin-animation" />
+              <div style={{ fontWeight: 600, fontSize: '0.95rem', color: '#0f172a' }}>
                 {loadingStep || 'Analyzing Code AST & Logic...'}
               </div>
-              <p style={{ fontSize: '0.78rem', color: '#94a3b8' }}>
+              <p style={{ fontSize: '0.78rem', color: '#64748b' }}>
                 Synthesizing execution paths, parameters, state variables, and visual diagram
               </p>
             </div>
@@ -789,7 +789,7 @@ export default function CodeExplainerTab({
           {/* Empty Prompt State when no explanation loaded yet */}
           {!loading && !explanation && !error && (
             <div className="explainer-empty-state">
-              <Lightbulb size={36} color="#38bdf8" />
+              <Lightbulb size={36} color="#4f46e5" />
               <h3>Ready to Explain Code & Logic</h3>
               <p>
                 Select any file from the project or paste a custom code snippet, then pick an explanation mode to get an instant breakdown.

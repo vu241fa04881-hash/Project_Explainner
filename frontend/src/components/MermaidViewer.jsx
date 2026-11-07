@@ -4,21 +4,21 @@ import { ZoomIn, ZoomOut, RotateCcw, Download, Copy, Check, Maximize2, Minimize2
 
 mermaid.initialize({
   startOnLoad: false,
-  theme: 'dark',
+  theme: 'neutral',
   themeVariables: {
-    primaryColor: '#1e293b',
-    primaryTextColor: '#f8fafc',
-    primaryBorderColor: '#38bdf8',
-    lineColor: '#60a5fa',
-    secondaryColor: '#0f172a',
-    tertiaryColor: '#1e1b4b',
-    background: '#090e17',
-    mainBkg: '#1e293b',
-    nodeBorder: '#38bdf8',
-    clusterBkg: '#0d1322',
-    clusterBorder: '#334155',
-    titleColor: '#e2e8f0',
-    edgeLabelBackground: '#0f172a'
+    primaryColor: '#ffffff',
+    primaryTextColor: '#0f172a',
+    primaryBorderColor: '#6366f1',
+    lineColor: '#4f46e5',
+    secondaryColor: '#f8fafc',
+    tertiaryColor: '#f1f5f9',
+    background: '#ffffff',
+    mainBkg: '#ffffff',
+    nodeBorder: '#6366f1',
+    clusterBkg: '#f8fafc',
+    clusterBorder: '#cbd5e1',
+    titleColor: '#0f172a',
+    edgeLabelBackground: '#ffffff'
   },
   flowchart: {
     useMaxWidth: false,

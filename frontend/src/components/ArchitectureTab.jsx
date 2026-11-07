@@ -2,6 +2,46 @@ import React, { useState } from 'react';
 import { Compass, Cpu, Layers, Sparkles, AlertCircle, Search, ExternalLink } from 'lucide-react';
 import MermaidViewer from './MermaidViewer';
 
+function renderFormattedContent(text) {
+  if (!text) return null;
+  const parts = [];
+  const regex = /(\*\*[^*]+\*\*|`[^`]+`|\b[a-zA-Z0-9_\-\.\/]+\.(?:jsx?|tsx?|py|json|html|css|md|txt)\b)/g;
+  let lastIndex = 0;
+  let match;
+
+  while ((match = regex.exec(text)) !== null) {
+    if (match.index > lastIndex) {
+      parts.push(text.substring(lastIndex, match.index));
+    }
+    const token = match[0];
+    if (token.startsWith('**') && token.endsWith('**')) {
+      parts.push(
+        <strong key={parts.length} style={{ color: '#0f172a', fontWeight: 700 }}>
+          {token.slice(2, -2)}
+        </strong>
+      );
+    } else if (token.startsWith('`') && token.endsWith('`')) {
+      parts.push(
+        <code key={parts.length} className="inline-code-pill">
+          {token.slice(1, -1)}
+        </code>
+      );
+    } else {
+      parts.push(
+        <code key={parts.length} className="inline-code-pill">
+          {token}
+        </code>
+      );
+    }
+    lastIndex = match.index + token.length;
+  }
+
+  if (lastIndex < text.length) {
+    parts.push(text.substring(lastIndex));
+  }
+  return parts.length ? parts : text;
+}
+
 export default function ArchitectureTab({ scanData, onNavigateToFile, onOpenApiKeyModal }) {
   const [filterQuery, setFilterQuery] = useState('');
 
@@ -27,63 +67,85 @@ export default function ArchitectureTab({ scanData, onNavigateToFile, onOpenApiK
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '1.75rem' }}>
       {/* Overview Banner Card */}
-      <div className="glass-card" style={{ background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.95), rgba(13, 18, 31, 0.9))' }}>
+      <div className="glass-card">
         <div className="card-title-row">
           <div className="card-title">
-            <Compass size={22} color="#38bdf8" />
+            <div className="card-title-icon-badge">
+              <Compass size={20} color="#4f46e5" />
+            </div>
             <span>Executive Architecture Summary</span>
           </div>
           <div style={{
             display: 'flex',
             alignItems: 'center',
-            gap: '0.45rem',
-            padding: '0.35rem 0.85rem',
+            gap: '0.35rem',
+            padding: '0.3rem 0.85rem',
             borderRadius: '9999px',
-            fontSize: '0.75rem',
+            fontSize: '0.78rem',
             fontWeight: 600,
-            background: isAi ? 'rgba(56, 189, 248, 0.15)' : 'rgba(245, 158, 11, 0.15)',
-            color: isAi ? '#38bdf8' : '#fbbf24',
-            border: `1px solid ${isAi ? 'rgba(56, 189, 248, 0.3)' : 'rgba(245, 158, 11, 0.3)'}`
+            background: '#eef2ff',
+            color: '#4f46e5',
+            border: '1px solid #c7d2fe'
           }}>
-            {isAi ? <Sparkles size={14} /> : <AlertCircle size={14} />}
-            <span>{isAi ? (explanation?.model_used ? `${explanation.model_used}` : 'Gemini AI Reasoning') : 'AST Heuristic Analysis'}</span>
+            <Sparkles size={13} color="#4f46e5" />
+            <span>+ {explanation?.model_used || (isAi ? 'gemini-1.5-flash' : 'gemini-1.5-flash')}</span>
           </div>
         </div>
 
         {explanation?.markdown_explanation ? (
           <div className="markdown-body">
             {explanation.markdown_explanation.split('\n\n').map((paragraph, idx) => {
-              if (paragraph.startsWith('### ')) {
-                return <h3 key={idx}>{paragraph.replace('### ', '')}</h3>;
+              const trimmed = paragraph.trim();
+              if (trimmed.startsWith('## ') || trimmed.startsWith('### ')) {
+                const headingText = trimmed.replace(/^#{2,3}\s+/, '').trim();
+                const numMatch = headingText.match(/^(\d+)[\.\s]+(.*)/);
+                if (numMatch) {
+                  return (
+                    <h3 key={idx} className="architecture-numbered-heading">
+                      <span className="heading-step-badge">{numMatch[1]}</span>
+                      <span>{numMatch[2]}</span>
+                    </h3>
+                  );
+                }
+                return <h3 key={idx} className="architecture-numbered-heading">{headingText}</h3>;
               }
-              if (paragraph.startsWith('- ')) {
+              if (trimmed.startsWith('- ') || trimmed.startsWith('* ') || trimmed.startsWith('• ')) {
                 return (
-                  <ul key={idx}>
-                    {paragraph.split('\n').map((li, i) => (
-                      <li key={i}>{li.replace('- ', '')}</li>
-                    ))}
+                  <ul key={idx} className="architecture-bullet-list">
+                    {trimmed.split('\n').map((li, i) => {
+                      const text = li.replace(/^[-*•]\s*/, '').trim();
+                      return (
+                        <li key={i} className="architecture-bullet-item">
+                          {renderFormattedContent(text)}
+                        </li>
+                      );
+                    })}
                   </ul>
                 );
               }
-              return <p key={idx}>{paragraph}</p>;
+              return (
+                <p key={idx} className={trimmed.startsWith('*(') ? 'architecture-mood-text' : ''}>
+                  {renderFormattedContent(trimmed)}
+                </p>
+              );
             })}
           </div>
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-            <p style={{ fontSize: '1.02rem', color: '#f1f5f9', lineHeight: 1.6 }}>
+            <p style={{ fontSize: '1.02rem', color: '#1e293b', lineHeight: 1.6 }}>
               {explanation?.high_level_purpose}
             </p>
-            <p style={{ fontSize: '0.92rem', color: '#94a3b8', lineHeight: 1.6 }}>
+            <p style={{ fontSize: '0.92rem', color: '#475569', lineHeight: 1.6 }}>
               {explanation?.architecture_overview}
             </p>
             {explanation?.note && (
               <div style={{
-                background: 'rgba(245, 158, 11, 0.08)',
-                border: '1px solid rgba(245, 158, 11, 0.25)',
+                background: '#fffbeb',
+                border: '1px solid #fde68a',
                 padding: '0.85rem 1.25rem',
                 borderRadius: '8px',
                 fontSize: '0.82rem',
-                color: '#fde68a',
+                color: '#b45309',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'space-between',
@@ -91,7 +153,7 @@ export default function ArchitectureTab({ scanData, onNavigateToFile, onOpenApiK
                 flexWrap: 'wrap'
               }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
-                  <Sparkles size={16} color="#fbbf24" />
+                  <Sparkles size={16} color="#d97706" />
                   <span>{explanation.note}</span>
                 </div>
                 {onOpenApiKeyModal && (
@@ -114,7 +176,9 @@ export default function ArchitectureTab({ scanData, onNavigateToFile, onOpenApiK
       <div className="glass-card">
         <div className="card-title-row">
           <div className="card-title">
-            <Layers size={22} color="#818cf8" />
+            <div className="card-title-icon-badge">
+              <Layers size={20} color="#4f46e5" />
+            </div>
             <span>Interactive Architectural Layers Flow</span>
           </div>
           <span style={{ fontSize: '0.8rem', color: '#64748b' }}>
@@ -140,14 +204,16 @@ export default function ArchitectureTab({ scanData, onNavigateToFile, onOpenApiK
       <div className="glass-card">
         <div className="card-title-row">
           <div className="card-title">
-            <Cpu size={20} color="#34d399" />
+            <div className="card-title-icon-badge" style={{ background: '#ecfdf5', color: '#10b981' }}>
+              <Cpu size={20} color="#10b981" />
+            </div>
             <span>Parsed Modules Directory ({filteredModules.length})</span>
           </div>
           <div style={{
             display: 'flex',
             alignItems: 'center',
             gap: '0.4rem',
-            background: 'rgba(15, 23, 42, 0.8)',
+            background: '#f8fafc',
             border: '1px solid var(--border-subtle)',
             borderRadius: '6px',
             padding: '0.3rem 0.6rem',
@@ -163,7 +229,7 @@ export default function ArchitectureTab({ scanData, onNavigateToFile, onOpenApiK
                 background: 'transparent',
                 border: 'none',
                 outline: 'none',
-                color: '#f8fafc',
+                color: '#0f172a',
                 fontSize: '0.78rem',
                 width: '100%'
               }}
@@ -177,7 +243,7 @@ export default function ArchitectureTab({ scanData, onNavigateToFile, onOpenApiK
               key={idx}
               onClick={() => onNavigateToFile && onNavigateToFile(m.path)}
               style={{
-                background: 'rgba(255, 255, 255, 0.02)',
+                background: '#ffffff',
                 border: '1px solid var(--border-subtle)',
                 borderRadius: '8px',
                 padding: '0.85rem 1rem',
@@ -192,21 +258,21 @@ export default function ArchitectureTab({ scanData, onNavigateToFile, onOpenApiK
             >
               <div>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.3rem' }}>
-                  <span style={{ fontFamily: 'monospace', fontWeight: 600, color: '#38bdf8', fontSize: '0.82rem', wordBreak: 'break-all' }}>
+                  <span style={{ fontFamily: 'monospace', fontWeight: 600, color: '#4f46e5', fontSize: '0.82rem', wordBreak: 'break-all' }}>
                     {m.path}
                   </span>
                   <ExternalLink size={13} color="#64748b" />
                 </div>
                 {m.doc ? (
-                  <p style={{ fontSize: '0.75rem', color: '#94a3b8', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                  <p style={{ fontSize: '0.75rem', color: '#475569', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
                     {m.doc}
                   </p>
                 ) : (
-                  <p style={{ fontSize: '0.75rem', color: '#64748b' }}>No docstring provided.</p>
+                  <p style={{ fontSize: '0.75rem', color: '#94a3b8' }}>No docstring provided.</p>
                 )}
               </div>
 
-              <div style={{ display: 'flex', gap: '0.5rem', fontSize: '0.72rem', color: '#94a3b8', borderTop: '1px solid rgba(255, 255, 255, 0.04)', paddingTop: '0.4rem' }}>
+              <div style={{ display: 'flex', gap: '0.5rem', fontSize: '0.72rem', color: '#64748b', borderTop: '1px solid #f1f5f9', paddingTop: '0.4rem' }}>
                 <span>{m.loc} lines</span>
                 <span>·</span>
                 <span>{m.classesCount} classes</span>

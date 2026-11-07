@@ -191,8 +191,8 @@ export default function ProjectSourceModal({
               <FolderUp size={20} />
             </div>
             <div>
-              <h3 style={{ fontSize: '1.15rem', fontWeight: 700, margin: 0 }}>Import / Open Project</h3>
-              <p style={{ fontSize: '0.8rem', color: '#94a3b8', margin: '0.2rem 0 0' }}>
+              <h3 style={{ fontSize: '1.15rem', fontWeight: 700, margin: 0, color: '#0f172a' }}>Import / Open Project</h3>
+              <p style={{ fontSize: '0.8rem', color: '#64748b', margin: '0.2rem 0 0' }}>
                 Upload a folder, clone a Git repo, or unpack a zip archive to analyze & ask doubts
               </p>
             </div>
@@ -323,9 +323,9 @@ export default function ProjectSourceModal({
               ) : (
                 <div className="dropzone-idle">
                   <div className="dropzone-icon-circle">
-                    <Upload size={24} color="#38bdf8" />
+                    <Upload size={24} color="#4f46e5" />
                   </div>
-                  <div style={{ fontWeight: 600, fontSize: '0.95rem', color: '#e2e8f0', marginTop: '0.6rem' }}>
+                  <div style={{ fontWeight: 600, fontSize: '0.95rem', color: '#0f172a', marginTop: '0.6rem' }}>
                     Click to select a project folder or drag & drop here
                   </div>
                   <p style={{ fontSize: '0.78rem', color: '#64748b', margin: '0.35rem 0 0' }}>
@@ -420,7 +420,7 @@ export default function ProjectSourceModal({
                     disabled={loading}
                   >
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                      <span style={{ fontWeight: 600, color: '#38bdf8', fontSize: '0.82rem' }}>{repo.name}</span>
+                      <span style={{ fontWeight: 600, color: '#4f46e5', fontSize: '0.82rem' }}>{repo.name}</span>
                       <ExternalLink size={12} color="#64748b" />
                     </div>
                     <span style={{ fontSize: '0.72rem', color: '#94a3b8', marginTop: '0.2rem', display: 'block', textAlign: 'left' }}>
@@ -502,9 +502,9 @@ export default function ProjectSourceModal({
               ) : (
                 <div className="dropzone-idle">
                   <div className="dropzone-icon-circle">
-                    <FileArchive size={24} color="#38bdf8" />
+                    <FileArchive size={24} color="#4f46e5" />
                   </div>
-                  <div style={{ fontWeight: 600, fontSize: '0.95rem', color: '#e2e8f0', marginTop: '0.6rem' }}>
+                  <div style={{ fontWeight: 600, fontSize: '0.95rem', color: '#0f172a', marginTop: '0.6rem' }}>
                     Drop a .zip project file here or click to browse
                   </div>
                   <p style={{ fontSize: '0.78rem', color: '#64748b', margin: '0.35rem 0 0' }}>

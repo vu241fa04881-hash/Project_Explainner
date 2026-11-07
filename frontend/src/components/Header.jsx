@@ -7,12 +7,9 @@ import {
   ArrowRight,
   Loader2,
   FolderUp,
-  GitBranch,
-  Upload,
   X,
   Database,
   Shield,
-  Lock,
   BookOpen
 } from 'lucide-react';
 
@@ -74,7 +71,7 @@ export default function Header({
             className="btn-open-project"
             title="Upload folder, clone Git repo, or unpack ZIP"
           >
-            <FolderUp size={16} color="#38bdf8" />
+            <FolderUp size={16} color="#4f46e5" />
             <span className="open-project-btn-label">Open / Ingest</span>
             {repoName && <span className="active-repo-badge">{repoName}</span>}
           </button>
@@ -82,15 +79,10 @@ export default function Header({
           <button
             type="button"
             onClick={onOpenSavedProjectsModal}
-            className="btn-open-project"
-            style={{
-              background: 'rgba(52, 211, 153, 0.09)',
-              borderColor: 'rgba(52, 211, 153, 0.35)',
-              color: '#34d399'
-            }}
+            className="btn-study-saved"
             title="Access and study previously uploaded documents and projects from your Supabase database"
           >
-            <BookOpen size={16} color="#34d399" />
+            <BookOpen size={16} color="#16a34a" />
             <span className="open-project-btn-label">Study Saved</span>
           </button>
 
@@ -98,11 +90,16 @@ export default function Header({
             <button
               type="button"
               onClick={onCloseWorkspace}
-              className="control-btn"
+              className="btn-study-saved"
               title="Remove / Close active workspace"
-              style={{ width: '28px', height: '28px', borderColor: 'rgba(244, 63, 94, 0.25)', color: '#f43f5e' }}
+              style={{
+                padding: '0.45rem',
+                minWidth: 'unset',
+                color: '#16a34a',
+                borderColor: '#bbf7d0'
+              }}
             >
-              <X size={14} color="#f43f5e" />
+              <X size={14} color="#16a34a" />
             </button>
           )}
         </div>
@@ -118,7 +115,6 @@ export default function Header({
             onChange={(e) => setLocalInput(e.target.value)}
             disabled={loading}
           />
-
 
           <button type="submit" className="btn-primary" disabled={loading || !localInput.trim()}>
             {loading ? (
@@ -146,7 +142,7 @@ export default function Header({
           title={supabaseUser ? `Private Supabase Active (${supabaseUser.email})` : 'Connect Your Private Supabase Database'}
           style={{ cursor: 'pointer', fontFamily: 'inherit' }}
         >
-          {supabaseUser ? <Shield size={13} color="#34d399" /> : <Database size={13} color="#38bdf8" />}
+          {supabaseUser ? <Shield size={13} color="#16a34a" /> : <Database size={13} color="#d97706" />}
           <span>{supabaseUser ? 'Private DB Active' : 'Connect Your Supabase'}</span>
         </button>
 
@@ -157,7 +153,14 @@ export default function Header({
           title={apiKey ? 'Gemini API Key active (Click to manage key)' : 'Click to provide your own Gemini API Key for AI reasoning'}
           style={{ cursor: 'pointer', fontFamily: 'inherit' }}
         >
-          <Key size={13} />
+          {apiKey ? (
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+              <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#16a34a', display: 'inline-block' }} />
+              <Sparkles size={13} color="#16a34a" />
+            </div>
+          ) : (
+            <Key size={13} color="#d97706" />
+          )}
           <span>{apiKey ? 'Gemini AI Active' : 'Enter Gemini Key'}</span>
         </button>
       </div>

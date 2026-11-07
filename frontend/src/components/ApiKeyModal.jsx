@@ -46,17 +46,17 @@ export default function ApiKeyModal({ isOpen, onClose, apiKey, onSaveKey }) {
               width: '36px',
               height: '36px',
               borderRadius: '8px',
-              background: 'rgba(56, 189, 248, 0.15)',
+              background: '#eef2ff',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              color: '#38bdf8'
+              color: '#4f46e5'
             }}>
               <Key size={18} />
             </div>
             <div>
-              <h3 style={{ fontSize: '1.1rem', fontWeight: 700 }}>Gemini API Settings</h3>
-              <p style={{ fontSize: '0.78rem', color: '#94a3b8' }}>Unlock deep AI architecture explanations and Q&A</p>
+              <h3 style={{ fontSize: '1.1rem', fontWeight: 700, color: '#0f172a' }}>Gemini API Settings</h3>
+              <p style={{ fontSize: '0.78rem', color: '#64748b' }}>Unlock deep AI architecture explanations and Q&A</p>
             </div>
           </div>
           <button className="control-btn" onClick={onClose}>
@@ -66,7 +66,7 @@ export default function ApiKeyModal({ isOpen, onClose, apiKey, onSaveKey }) {
 
         <form onSubmit={handleSave}>
           <div style={{ marginBottom: '1.25rem' }}>
-            <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 600, color: '#cbd5e1', marginBottom: '0.5rem' }}>
+            <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 600, color: '#334155', marginBottom: '0.5rem' }}>
               Gemini API Key
             </label>
             <input
@@ -75,26 +75,26 @@ export default function ApiKeyModal({ isOpen, onClose, apiKey, onSaveKey }) {
               value={inputVal}
               onChange={(e) => setInputVal(e.target.value)}
               className="chat-input"
-              style={{ width: '100%', fontFamily: 'monospace' }}
+              style={{ width: '100%', fontFamily: 'monospace', background: '#f8fafc', border: '1px solid var(--border-subtle)', color: '#0f172a' }}
             />
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.4rem', marginTop: '0.6rem', fontSize: '0.75rem' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: '#10b981' }}>
-                <ShieldCheck size={14} color="#10b981" />
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.4rem', marginTop: '0.6rem', fontSize: '0.75rem', flexWrap: 'wrap' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: '#16a34a' }}>
+                <ShieldCheck size={14} color="#16a34a" />
                 <span>In-memory only: Never saved to disk or localStorage.</span>
               </div>
               <a
                 href="https://aistudio.google.com/app/apikey"
                 target="_blank"
                 rel="noopener noreferrer"
-                style={{ color: '#38bdf8', textDecoration: 'none', fontWeight: 500 }}
+                style={{ color: '#4f46e5', textDecoration: 'none', fontWeight: 500 }}
               >
                 Get a free key from Google AI Studio &rarr;
               </a>
             </div>
           </div>
 
-          <div style={{ background: 'rgba(255, 255, 255, 0.03)', padding: '0.85rem', borderRadius: '8px', marginBottom: '1.5rem', fontSize: '0.8rem', color: '#94a3b8', lineHeight: 1.5 }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: '#38bdf8', fontWeight: 600, marginBottom: '0.3rem' }}>
+          <div style={{ background: '#f8fafc', border: '1px solid var(--border-subtle)', padding: '0.85rem', borderRadius: '8px', marginBottom: '1.5rem', fontSize: '0.8rem', color: '#475569', lineHeight: 1.5 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: '#4f46e5', fontWeight: 600, marginBottom: '0.3rem' }}>
               <Sparkles size={14} /> Zero-Storage Ephemeral Policy
             </div>
             Your Gemini API Key is held strictly in volatile RAM memory for this tab session. It is never logged, never stored on disk, and is instantly cleared as soon as you close or reload this page.

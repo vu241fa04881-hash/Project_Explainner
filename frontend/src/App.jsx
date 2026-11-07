@@ -12,7 +12,10 @@ import {
   FileArchive,
   FolderSearch,
   X,
-  Sparkles
+  Sparkles,
+  Link2,
+  Lightbulb,
+  ArrowLeftRight
 } from 'lucide-react';
 
 import Header from './components/Header';
@@ -353,22 +356,28 @@ export default function App() {
           <div className="stats-items-group">
             <div className="stat-pill">
               <span className="stat-label">Project:</span>
-              <span className="stat-value" style={{ color: '#38bdf8' }}>{scanData.repo_name}</span>
+              <span className="stat-value" style={{ color: '#2563eb' }}>{scanData.repo_name}</span>
             </div>
+            <span className="stat-divider">|</span>
             {scanData.isFromSupabase && (
-              <div className="stat-pill" style={{ borderColor: 'rgba(52, 211, 153, 0.4)', backgroundColor: 'rgba(52, 211, 153, 0.08)' }}>
-                <span className="stat-label" style={{ color: '#34d399' }}>Source:</span>
-                <span className="stat-value" style={{ color: '#34d399' }}>Saved in Supabase</span>
-              </div>
+              <>
+                <div className="stat-pill" style={{ borderColor: '#bbf7d0', backgroundColor: '#f0fdf4' }}>
+                  <span className="stat-label" style={{ color: '#16a34a' }}>Source:</span>
+                  <span className="stat-value" style={{ color: '#16a34a' }}>Saved in Supabase</span>
+                </div>
+                <span className="stat-divider">|</span>
+              </>
             )}
             <div className="stat-pill">
               <span className="stat-label">Files:</span>
               <span className="stat-value">{scanData.total_files}</span>
             </div>
+            <span className="stat-divider">|</span>
             <div className="stat-pill">
               <span className="stat-label">Lines of Code:</span>
               <span className="stat-value">{scanData.total_loc.toLocaleString()}</span>
             </div>
+            <span className="stat-divider">|</span>
             <div className="stat-pill">
               <span className="stat-label">Dependencies:</span>
               <span className="stat-value">{stats.total_edges || 0}</span>
@@ -377,9 +386,16 @@ export default function App() {
               onClick={() => handleOpenSourceModal('folder')}
               className="btn-secondary"
               title="Import or Switch Project"
-              style={{ padding: '0.2rem 0.55rem', fontSize: '0.72rem', gap: '0.3rem' }}
+              style={{
+                padding: '0.25rem 0.65rem',
+                fontSize: '0.75rem',
+                gap: '0.35rem',
+                background: '#ffffff',
+                border: '1px solid #e2e8f0',
+                color: '#334155'
+              }}
             >
-              <FolderUp size={12} color="#38bdf8" />
+              <ArrowLeftRight size={13} color="#475569" />
               <span>Change Project</span>
             </button>
             <button
@@ -387,32 +403,37 @@ export default function App() {
               className="btn-secondary"
               title="Remove / Close active workspace"
               style={{
-                padding: '0.2rem 0.55rem',
-                fontSize: '0.72rem',
-                gap: '0.3rem',
-                color: '#f43f5e',
-                borderColor: 'rgba(244, 63, 94, 0.3)',
-                background: 'rgba(244, 63, 94, 0.08)'
+                padding: '0.25rem 0.65rem',
+                fontSize: '0.75rem',
+                gap: '0.35rem',
+                color: '#e11d48',
+                borderColor: '#fecdd3',
+                background: '#fff1f2'
               }}
             >
-              <X size={12} color="#f43f5e" />
+              <X size={12} color="#e11d48" />
               <span>Remove Workspace</span>
             </button>
             <button
               onClick={() => scanData?.repo_path && handleScan(scanData.repo_path)}
               className="control-btn"
               title="Rescan & Refresh"
-              style={{ width: '26px', height: '26px' }}
+              style={{
+                width: '28px',
+                height: '28px',
+                background: '#ffffff',
+                border: '1px solid #e2e8f0'
+              }}
             >
-              <RefreshCw size={13} color="#94a3b8" />
+              <RefreshCw size={13} color="#64748b" />
             </button>
           </div>
 
           {/* Language Breakdown */}
           <div className="lang-pills-row">
             {Object.entries(languages).map(([lang, count]) => (
-              <span key={lang} className="lang-tag">
-                {lang}: {count}
+              <span key={lang} className={`lang-tag lang-tag-${lang.toLowerCase()}`}>
+                {lang.toLowerCase()}: {count}
               </span>
             ))}
           </div>
@@ -434,7 +455,7 @@ export default function App() {
             onClick={() => setActiveTab('visualizer')}
             className={`tab-btn ${activeTab === 'visualizer' ? 'active' : ''}`}
           >
-            <Network size={17} />
+            <Link2 size={17} />
             <span>Dependency & Diagrams</span>
           </button>
 
@@ -450,7 +471,7 @@ export default function App() {
             onClick={() => setActiveTab('explainer')}
             className={`tab-btn ${activeTab === 'explainer' ? 'active' : ''}`}
           >
-            <Sparkles size={17} />
+            <Lightbulb size={17} />
             <span>Code & Logic Explainer</span>
           </button>
 

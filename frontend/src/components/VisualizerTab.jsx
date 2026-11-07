@@ -67,7 +67,7 @@ export default function VisualizerTab({ scanData, onNavigateToFile }) {
               <span style={{ fontSize: '0.72rem', color: '#94a3b8', marginRight: '0.2rem' }}>Layout:</span>
               <button
                 className={`control-btn ${direction === 'TD' ? 'active' : ''}`}
-                style={{ width: '28px', height: '28px', color: direction === 'TD' ? '#38bdf8' : '#94a3b8' }}
+                style={{ width: '28px', height: '28px', color: direction === 'TD' ? '#4f46e5' : '#94a3b8' }}
                 title="Top to Bottom Flow"
                 onClick={() => setDirection('TD')}
               >
@@ -75,7 +75,7 @@ export default function VisualizerTab({ scanData, onNavigateToFile }) {
               </button>
               <button
                 className={`control-btn ${direction === 'LR' ? 'active' : ''}`}
-                style={{ width: '28px', height: '28px', color: direction === 'LR' ? '#38bdf8' : '#94a3b8' }}
+                style={{ width: '28px', height: '28px', color: direction === 'LR' ? '#4f46e5' : '#94a3b8' }}
                 title="Left to Right Flow"
                 onClick={() => setDirection('LR')}
               >
@@ -86,10 +86,10 @@ export default function VisualizerTab({ scanData, onNavigateToFile }) {
 
           <div style={{ display: 'flex', gap: '0.85rem', alignItems: 'center', fontSize: '0.78rem' }}>
             <span style={{ color: '#94a3b8' }}>
-              Nodes: <strong style={{ color: '#38bdf8' }}>{stats.total_nodes || 0}</strong>
+              Nodes: <strong style={{ color: '#2563eb' }}>{stats.total_nodes || 0}</strong>
             </span>
             <span style={{ color: '#94a3b8' }}>
-              Edges: <strong style={{ color: '#818cf8' }}>{stats.total_edges || 0}</strong>
+              Edges: <strong style={{ color: '#4f46e5' }}>{stats.total_edges || 0}</strong>
             </span>
             <span style={{ color: '#94a3b8' }}>
               Cycles: <strong style={{ color: stats.cycles_count > 0 ? '#f43f5e' : '#10b981' }}>{stats.cycles_count || 0}</strong>
@@ -103,7 +103,7 @@ export default function VisualizerTab({ scanData, onNavigateToFile }) {
         <div className="glass-card">
           <div className="card-title-row">
             <div className="card-title">
-              <Network size={20} color="#38bdf8" />
+              <Network size={20} color="#4f46e5" />
               <span>Inter-Module Dependency Graph</span>
             </div>
             <span style={{ fontSize: '0.8rem', color: '#64748b' }}>
@@ -145,11 +145,11 @@ export default function VisualizerTab({ scanData, onNavigateToFile }) {
             <div className="glass-card">
               <div className="card-title-row">
                 <div className="card-title">
-                  <GitFork size={20} color="#38bdf8" />
+                  <GitFork size={20} color="#4f46e5" />
                   <span>Most Depended-Upon Modules</span>
                 </div>
               </div>
-              <p style={{ fontSize: '0.82rem', color: '#94a3b8', marginBottom: '1rem' }}>
+              <p style={{ fontSize: '0.82rem', color: '#64748b', marginBottom: '1rem' }}>
                 Files with highest in-degree centrality. Click to inspect symbols and usage.
               </p>
               {stats.top_depended && stats.top_depended.length > 0 ? (
@@ -163,7 +163,7 @@ export default function VisualizerTab({ scanData, onNavigateToFile }) {
                         alignItems: 'center',
                         justifyContent: 'space-between',
                         padding: '0.75rem 1rem',
-                        background: 'rgba(255, 255, 255, 0.03)',
+                        background: '#ffffff',
                         borderRadius: '8px',
                         border: '1px solid var(--border-subtle)',
                         cursor: 'pointer',
@@ -172,12 +172,13 @@ export default function VisualizerTab({ scanData, onNavigateToFile }) {
                       className="depended-item-hover"
                     >
                       <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                        <span style={{ fontFamily: 'monospace', fontSize: '0.82rem', color: '#e2e8f0' }}>{item.file}</span>
-                        <ExternalLink size={13} color="#38bdf8" />
+                        <span style={{ fontFamily: 'monospace', fontSize: '0.82rem', color: '#0f172a' }}>{item.file}</span>
+                        <ExternalLink size={13} color="#4f46e5" />
                       </div>
                       <span style={{
-                        background: 'rgba(56, 189, 248, 0.15)',
-                        color: '#38bdf8',
+                        background: '#eef2ff',
+                        color: '#4f46e5',
+                        border: '1px solid #c7d2fe',
                         padding: '0.2rem 0.6rem',
                         borderRadius: '9999px',
                         fontSize: '0.75rem',

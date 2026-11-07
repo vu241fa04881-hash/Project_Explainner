@@ -244,9 +244,9 @@ export default function AssistantTab({
           fontSize: '0.82rem'
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-            <FileCode size={15} color="#38bdf8" />
-            <span style={{ color: '#94a3b8' }}>Currently inspecting:</span>
-            <code style={{ color: '#38bdf8', fontWeight: 600 }}>{activeInspectorFile}</code>
+            <FileCode size={15} color="#4f46e5" />
+            <span style={{ color: '#64748b' }}>Currently inspecting:</span>
+            <code style={{ color: '#4f46e5', fontWeight: 600 }}>{activeInspectorFile}</code>
           </div>
           <button
             type="button"
@@ -262,18 +262,18 @@ export default function AssistantTab({
 
       {!apiKey && (
         <div style={{
-          background: 'linear-gradient(90deg, rgba(245, 158, 11, 0.12), rgba(56, 189, 248, 0.08))',
-          borderBottom: '1px solid rgba(245, 158, 11, 0.25)',
+          background: '#fffbeb',
+          borderBottom: '1px solid #fde68a',
           padding: '0.65rem 1.5rem',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
           gap: '0.75rem',
           fontSize: '0.82rem',
-          color: '#fde68a'
+          color: '#b45309'
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-            <Sparkles size={15} color="#fbbf24" />
+            <Sparkles size={15} color="#d97706" />
             <span>Currently in <strong>AST Heuristic Mode</strong>. Enter your own Gemini API key for conversational AI reasoning and code recommendations.</span>
           </div>
           {onOpenApiKeyModal && (
@@ -293,7 +293,7 @@ export default function AssistantTab({
       <div className="chat-history">
         {messages.map((msg, idx) => (
           <div key={idx} className={`chat-bubble ${msg.role}`}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.45rem', fontSize: '0.78rem', color: msg.role === 'user' ? '#e0f2fe' : '#38bdf8', fontWeight: 600 }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.45rem', fontSize: '0.78rem', color: msg.role === 'user' ? '#ffffff' : '#4f46e5', fontWeight: 600 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                 {msg.role === 'user' ? <User size={14} /> : <Bot size={14} />}
                 <span>{msg.role === 'user' ? 'You' : 'Project Explainer AI'}</span>
@@ -308,8 +308,8 @@ export default function AssistantTab({
             {renderMessageContent(msg.text, idx)}
 
             {msg.sources && msg.sources.length > 0 && (
-              <div style={{ marginTop: '0.85rem', paddingTop: '0.65rem', borderTop: '1px solid rgba(255, 255, 255, 0.08)', display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
-                <span style={{ fontSize: '0.72rem', color: '#94a3b8' }}>Relevant modules:</span>
+              <div style={{ marginTop: '0.85rem', paddingTop: '0.65rem', borderTop: '1px solid #e2e8f0', display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
+                <span style={{ fontSize: '0.72rem', color: '#64748b' }}>Relevant modules:</span>
                 {msg.sources.map((src, sIdx) => (
                   <button
                     key={sIdx}
@@ -328,8 +328,8 @@ export default function AssistantTab({
         ))}
 
         {loading && (
-          <div className="chat-bubble assistant" style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', color: '#94a3b8' }}>
-            <Loader2 size={16} className="spin-animation" color="#38bdf8" />
+          <div className="chat-bubble assistant" style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', color: '#64748b' }}>
+            <Loader2 size={16} className="spin-animation" color="#4f46e5" />
             <span>Analyzing repository context and drafting response...</span>
           </div>
         )}

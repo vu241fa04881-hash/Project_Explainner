@@ -343,10 +343,10 @@ export default function SavedProjectsModal({
             }}>
               <BookOpen size={40} color="#64748b" />
               <div>
-                <h4 style={{ color: '#f1f5f9', fontSize: '1.05rem', margin: '0 0 0.4rem' }}>
+                <h4 style={{ color: '#0f172a', fontSize: '1.05rem', margin: '0 0 0.4rem' }}>
                   {searchQuery ? 'No Matching Projects Found' : 'No Saved Projects Yet'}
                 </h4>
-                <p style={{ fontSize: '0.82rem', maxWidth: '400px', margin: '0 auto', lineHeight: 1.5 }}>
+                <p style={{ fontSize: '0.82rem', maxWidth: '400px', margin: '0 auto', lineHeight: 1.5, color: '#64748b' }}>
                   {searchQuery
                     ? `No saved project matches "${searchQuery}". Try a different keyword.`
                     : 'Any folder, Git repository, or ZIP file you analyze will be stored in your database. You can return here anytime to study them.'}
@@ -369,15 +369,15 @@ export default function SavedProjectsModal({
                 <div
                   key={p.id}
                   style={{
-                    backgroundColor: 'rgba(30, 41, 59, 0.45)',
-                    border: '1px solid rgba(255, 255, 255, 0.08)',
+                    backgroundColor: '#f8fafc',
+                    border: '1px solid var(--border-subtle)',
                     borderRadius: '10px',
                     padding: '1.1rem 1.25rem',
                     display: 'flex',
                     flexDirection: 'column',
                     gap: '0.75rem',
                     transition: 'all 0.2s ease',
-                    boxShadow: '0 4px 12px rgba(0, 0, 0, 0.2)'
+                    boxShadow: '0 1px 3px rgba(0, 0, 0, 0.05)'
                   }}
                   className="saved-project-card"
                 >
@@ -386,16 +386,16 @@ export default function SavedProjectsModal({
                       <div style={{
                         padding: '0.45rem',
                         borderRadius: '8px',
-                        backgroundColor: 'rgba(15, 23, 42, 0.6)',
-                        border: '1px solid rgba(255, 255, 255, 0.06)'
+                        backgroundColor: '#ffffff',
+                        border: '1px solid var(--border-subtle)'
                       }}>
                         {getSourceIcon(p.source_type)}
                       </div>
                       <div>
-                        <h4 style={{ fontSize: '0.96rem', fontWeight: 700, margin: 0, color: '#f1f5f9' }}>
+                        <h4 style={{ fontSize: '0.96rem', fontWeight: 700, margin: 0, color: '#0f172a' }}>
                           {p.name}
                         </h4>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.73rem', color: '#94a3b8', marginTop: '2px' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.73rem', color: '#64748b', marginTop: '2px' }}>
                           <span style={{ display: 'flex', alignItems: 'center', gap: '3px' }}>
                             <Calendar size={11} /> {dateStr}
                           </span>
@@ -451,12 +451,12 @@ export default function SavedProjectsModal({
                   {p.project_scans?.[0]?.summary && (
                     <div style={{
                       fontSize: '0.78rem',
-                      color: '#cbd5e1',
+                      color: '#475569',
                       lineHeight: 1.45,
-                      backgroundColor: 'rgba(15, 23, 42, 0.5)',
+                      backgroundColor: '#ffffff',
                       padding: '0.55rem 0.75rem',
                       borderRadius: '6px',
-                      border: '1px solid rgba(255, 255, 255, 0.04)'
+                      border: '1px solid var(--border-subtle)'
                     }}>
                       {p.project_scans[0].summary.slice(0, 180)}
                       {p.project_scans[0].summary.length > 180 ? '...' : ''}
@@ -466,15 +466,15 @@ export default function SavedProjectsModal({
                   {/* Project Metrics Pills */}
                   <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: '0.5rem' }}>
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem', fontSize: '0.73rem' }}>
-                      <span style={{ backgroundColor: 'rgba(56, 189, 248, 0.1)', color: '#38bdf8', padding: '0.15rem 0.5rem', borderRadius: '4px', border: '1px solid rgba(56, 189, 248, 0.25)' }}>
+                      <span style={{ backgroundColor: '#eff6ff', color: '#2563eb', padding: '0.15rem 0.5rem', borderRadius: '4px', border: '1px solid #bfdbfe' }}>
                         <strong>{p.files_count?.toLocaleString() || 0}</strong> Files
                       </span>
                       {p.data_files_count > 0 && (
-                        <span style={{ backgroundColor: 'rgba(52, 211, 153, 0.1)', color: '#34d399', padding: '0.15rem 0.5rem', borderRadius: '4px', border: '1px solid rgba(52, 211, 153, 0.25)' }}>
+                        <span style={{ backgroundColor: '#ecfdf5', color: '#059669', padding: '0.15rem 0.5rem', borderRadius: '4px', border: '1px solid #bbf7d0' }}>
                           <strong>{p.data_files_count.toLocaleString()}</strong> Data Datasets
                         </span>
                       )}
-                      <span style={{ backgroundColor: 'rgba(148, 163, 184, 0.1)', color: '#cbd5e1', padding: '0.15rem 0.5rem', borderRadius: '4px', border: '1px solid rgba(148, 163, 184, 0.2)' }}>
+                      <span style={{ backgroundColor: '#f1f5f9', color: '#475569', padding: '0.15rem 0.5rem', borderRadius: '4px', border: '1px solid #e2e8f0' }}>
                         <strong>{p.loc?.toLocaleString() || 0}</strong> LOC
                       </span>
                     </div>
@@ -484,8 +484,9 @@ export default function SavedProjectsModal({
                         {topLanguages.map((lang, idx) => (
                           <span key={idx} style={{
                             fontSize: '0.7rem',
-                            color: '#94a3b8',
-                            backgroundColor: 'rgba(255, 255, 255, 0.04)',
+                            color: '#64748b',
+                            backgroundColor: '#ffffff',
+                            border: '1px solid var(--border-subtle)',
                             padding: '0.1rem 0.4rem',
                             borderRadius: '4px'
                           }}>
@@ -504,3 +505,4 @@ export default function SavedProjectsModal({
     </div>
   );
 }
+

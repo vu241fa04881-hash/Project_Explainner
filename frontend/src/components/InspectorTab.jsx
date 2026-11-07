@@ -34,17 +34,17 @@ function TreeNode({ node, onSelectFile, selectedFile, searchTerm }) {
             cursor: 'pointer',
             borderRadius: '5px',
             fontSize: '0.82rem',
-            color: '#cbd5e1',
+            color: '#334155',
             userSelect: 'none'
           }}
           className="tree-dir-hover"
         >
           {isOpen ? <ChevronDown size={14} color="#94a3b8" /> : <ChevronRight size={14} color="#94a3b8" />}
-          {isOpen ? <FolderOpen size={15} color="#38bdf8" /> : <Folder size={15} color="#38bdf8" />}
+          {isOpen ? <FolderOpen size={15} color="#4f46e5" /> : <Folder size={15} color="#4f46e5" />}
           <span style={{ fontWeight: 600 }}>{node.name}</span>
         </div>
         {isOpen && node.children && (
-          <div style={{ borderLeft: '1px solid rgba(255, 255, 255, 0.08)', marginLeft: '0.55rem', paddingLeft: '0.2rem' }}>
+          <div style={{ borderLeft: '1px solid var(--border-subtle)', marginLeft: '0.55rem', paddingLeft: '0.2rem' }}>
             {node.children.map((child, idx) => (
               <TreeNode
                 key={idx}
@@ -78,9 +78,9 @@ function TreeNode({ node, onSelectFile, selectedFile, searchTerm }) {
         cursor: 'pointer',
         borderRadius: '6px',
         fontSize: '0.8rem',
-        background: isSelected ? 'rgba(56, 189, 248, 0.18)' : 'transparent',
-        border: isSelected ? '1px solid rgba(56, 189, 248, 0.4)' : '1px solid transparent',
-        color: isSelected ? '#38bdf8' : '#94a3b8',
+        background: isSelected ? '#eef2ff' : 'transparent',
+        border: isSelected ? '1px solid #c7d2fe' : '1px solid transparent',
+        color: isSelected ? '#4f46e5' : '#475569',
         fontWeight: isSelected ? 600 : 400,
         transition: 'all 0.15s ease'
       }}
@@ -88,9 +88,9 @@ function TreeNode({ node, onSelectFile, selectedFile, searchTerm }) {
     >
       <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem', overflow: 'hidden' }}>
         {node.category === 'data' || ['.csv', '.tsv', '.json', '.sql', '.xml', '.parquet'].some(ext => node.name.toLowerCase().endsWith(ext)) ? (
-          <Database size={14} color={isSelected ? '#34d399' : '#10b981'} />
+          <Database size={14} color={isSelected ? '#16a34a' : '#10b981'} />
         ) : (
-          <FileCode size={14} color={isSelected ? '#38bdf8' : '#64748b'} />
+          <FileCode size={14} color={isSelected ? '#4f46e5' : '#64748b'} />
         )}
         <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{node.name}</span>
       </div>
@@ -242,11 +242,11 @@ export default function InspectorTab({
                 title="Expand file tree"
                 style={{ marginRight: '0.3rem' }}
               >
-                <PanelLeft size={16} color="#38bdf8" />
+                <PanelLeft size={16} color="#4f46e5" />
               </button>
             )}
-            <FileCode size={16} color="#38bdf8" />
-            <span style={{ fontFamily: 'monospace', fontWeight: 600, fontSize: '0.85rem', color: '#f8fafc' }}>
+            <FileCode size={16} color="#4f46e5" />
+            <span style={{ fontFamily: 'monospace', fontWeight: 600, fontSize: '0.85rem', color: '#0f172a' }}>
               {selectedPath || 'Select a file to inspect'}
             </span>
           </div>

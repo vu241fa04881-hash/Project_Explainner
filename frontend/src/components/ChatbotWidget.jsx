@@ -305,11 +305,9 @@ export default function ChatbotWidget({
           <div className="chatbot-trigger-icon-wrap">
             <Sparkles size={24} className="sparkle-pulse" />
           </div>
-          {activeInspectorFile && (
-            <span className="chatbot-round-badge" title={`Focused file: ${activeInspectorFile}`}>
-              <span className="badge-ping" />
-            </span>
-          )}
+          <span className="chatbot-round-badge" title={activeInspectorFile ? `Focused file: ${activeInspectorFile}` : 'AI Explainer Ready'}>
+            <span className="badge-ping" />
+          </span>
           <span className="chatbot-floating-tooltip">
             {activeInspectorFile ? `Ask Doubts • ${activeInspectorFile}` : 'Ask AI Doubts'}
           </span>
@@ -323,7 +321,7 @@ export default function ChatbotWidget({
           <div className="chatbot-header">
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
               <div className="chatbot-avatar-badge">
-                <Bot size={18} color="#38bdf8" />
+                <Bot size={18} color="#4f46e5" />
               </div>
               <div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
@@ -332,7 +330,7 @@ export default function ChatbotWidget({
                     type="button"
                     onClick={onOpenApiKeyModal}
                     className={`ai-mode-pill ${apiKey ? 'active-ai' : 'heuristic'}`}
-                    style={{ cursor: 'pointer', border: 'none', background: apiKey ? 'rgba(56, 189, 248, 0.2)' : 'rgba(245, 158, 11, 0.2)' }}
+                    style={{ cursor: 'pointer', border: 'none', background: apiKey ? '#eef2ff' : '#fffbeb', color: apiKey ? '#4f46e5' : '#d97706' }}
                     title={apiKey ? 'Gemini AI reasoning active (Click to manage key)' : 'Click to enter your Gemini API Key'}
                   >
                     {apiKey ? 'Gemini AI' : 'AST Mode (Add Key)'}
